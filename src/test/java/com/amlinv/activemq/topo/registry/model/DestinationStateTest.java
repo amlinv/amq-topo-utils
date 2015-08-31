@@ -20,6 +20,9 @@ package com.amlinv.activemq.topo.registry.model;
 import org.junit.Before;
 import org.junit.Test;
 
+import java.util.HashMap;
+
+import static junit.framework.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
 import static org.junit.Assert.assertTrue;
 
@@ -73,5 +76,55 @@ public class DestinationStateTest {
 
         this.destinationState.putBrokerInfo("x-broker1-x", false);
         assertFalse(this.destinationState.existsAnyBroker());
+    }
+
+    @Test
+    public void testExistsOnBroker() throws Exception {
+        assertFalse(this.destinationState.existsOnBroker("x-broker1-x"));
+
+        this.destinationState.putBrokerInfo("x-broker1-x", true);
+        assertTrue(this.destinationState.existsOnBroker("x-broker1-x"));
+
+        this.destinationState.putBrokerInfo("x-broker1-x", false);
+        assertFalse(this.destinationState.existsOnBroker("x-broker1-x"));
+    }
+
+    @Test
+    public void testEquals() throws Exception {
+        assertFalse(this.destinationState.equals("xxx"));
+        assertFalse(this.destinationState.equals(null));
+        assertTrue(this.destinationState.equals(this.destinationState));
+        assertTrue(this.destinationState.equals(new DestinationState("x-dest-name-x")));
+
+        assertFalse(this.destinationState.equals(new DestinationState("x-dest-name2-x")));
+    }
+
+    @Test
+    public void testEqualsOnBrokerDetails() throws Exception {
+        this.destinationState.putBrokerInfo("x-broker-id-x", true);
+
+        DestinationState state2 = new DestinationState("x-dest-name-x");
+        assertFalse(this.destinationState.equals(state2));
+
+        state2.putBrokerInfo("x-broker-id-x", true);
+        assertTrue(this.destinationState.equals(state2));
+    }
+
+    @Test
+    public void testHashCode() throws Exception {
+        assertEquals((31 * "x-dest-name-x".hashCode() ) + new HashMap<>().hashCode(), this.destinationState.hashCode());
+        assertEquals(new HashMap<>().hashCode(), new DestinationState((String) null).hashCode());
+    }
+
+    @Test
+    public void testPerBrokerEquals() throws Exception {
+        DestinationState.PerBrokerInfo info1 = new DestinationState.PerBrokerInfo(11, true);
+        assertTrue(info1.equals(info1));
+        assertTrue(info1.equals(new DestinationState.PerBrokerInfo(11, true)));
+        assertTrue(info1.equals(new DestinationState.PerBrokerInfo(12, true)));
+
+        assertFalse(info1.equals(new DestinationState.PerBrokerInfo(11, false)));
+        assertFalse(info1.equals("other-object-type"));
+        assertFalse(info1.equals(null));
     }
 }

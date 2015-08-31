@@ -83,15 +83,76 @@ public class DestinationState extends DestinationInfo {
     }
 
     /**
+     * Determine whether this destination exists on the broker with the given ID.
+     *
+     * @param brokerId ID of the broker on which to check for existence of the destination.
+     * @return true => if the destination exists on the broker with the given ID; false if the destination does not
+     * exist on the broker with the given ID regardless of whether the destination has even been seen on the same
+     * broker.
+     */
+    public boolean existsOnBroker (String brokerId) {
+        boolean result = false;
+
+        PerBrokerInfo info;
+        synchronized (this.brokerDetails) {
+            info = this.brokerDetails.get(brokerId);
+        }
+
+        if ((info != null) && (info.exists)) {
+            result = true;
+        }
+
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+
+        DestinationState that = (DestinationState) o;
+
+        boolean result = brokerDetails.equals(that.brokerDetails);
+
+        if (result) {
+            result = super.equals(o);
+        }
+
+        return result;
+    }
+
+    @Override
+    public int hashCode() {
+        int result = super.hashCode();
+        return ( 31 * result ) + brokerDetails.hashCode();
+    }
+
+
+                                                 ////             ////
+                                                 ////  INTERNALS  ////
+                                                 ////             ////
+
+    /**
      * Keep details for the destination as it pertains to a single broker.
      */
-    protected class PerBrokerInfo {
+    protected static class PerBrokerInfo {
         public long lastSeen;
         public boolean exists;
 
         public PerBrokerInfo(long lastSeen, boolean exists) {
             this.lastSeen = lastSeen;
             this.exists = exists;
+        }
+
+        @Override
+        public boolean equals(Object o) {
+            if (this == o) return true;
+            if (o == null || getClass() != o.getClass()) return false;
+
+            PerBrokerInfo that = (PerBrokerInfo) o;
+
+            return exists == that.exists;
+
         }
     }
 }

@@ -38,4 +38,23 @@ public class DestinationInfoTest {
     public void testGetName() throws Exception {
         assertEquals("x-dest-name-x", this.destinationInfo.getName());
     }
+
+    @Test
+    public void testEquals() throws Exception {
+        assertTrue(this.destinationInfo.equals(this.destinationInfo));
+        assertTrue(this.destinationInfo.equals(new DestinationInfo("x-dest-name-x")));
+        assertTrue(new DestinationInfo(null).equals(new DestinationInfo(null)));
+
+        assertFalse(this.destinationInfo.equals(null));
+        assertFalse(this.destinationInfo.equals("x-non-destinfo-x"));
+        assertFalse(this.destinationInfo.equals(new DestinationInfo("x-dest-name2-x")));
+        assertFalse(new DestinationInfo(null).equals(new DestinationInfo("x-dest-name-x")));
+    }
+
+    @Test
+    public void testHashCode() throws Exception {
+        assertEquals("x-dest-name-x".hashCode(), this.destinationInfo.hashCode());
+        assertEquals("x-dest-name2-x".hashCode(), new DestinationInfo("x-dest-name2-x").hashCode());
+        assertEquals(0, new DestinationInfo(null).hashCode());
+    }
 }
