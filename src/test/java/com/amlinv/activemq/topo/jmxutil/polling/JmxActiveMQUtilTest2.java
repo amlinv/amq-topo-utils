@@ -40,8 +40,6 @@ public class JmxActiveMQUtilTest2 {
 
     private JmxActiveMQUtil2 util;
 
-    private MBeanAccessConnectionFactoryUtil origFactoryUtil;
-
     private MBeanAccessConnectionFactoryUtil mockFactoryUtil;
     private MBeanAccessConnectionFactory mockConnectionFactory;
     private MBeanAccessConnection mockConnection;
@@ -49,8 +47,6 @@ public class JmxActiveMQUtilTest2 {
     @Before
     public void setupTest() throws Exception {
         this.util = new JmxActiveMQUtil2();
-
-        this.origFactoryUtil = JmxActiveMQUtil.getConnectionFactoryUtil();
 
         this.mockFactoryUtil = Mockito.mock(MBeanAccessConnectionFactoryUtil.class);
         this.mockConnectionFactory = Mockito.mock(MBeanAccessConnectionFactory.class);

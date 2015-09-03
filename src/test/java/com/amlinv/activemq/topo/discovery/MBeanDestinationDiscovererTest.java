@@ -17,7 +17,7 @@
 
 package com.amlinv.activemq.topo.discovery;
 
-import com.amlinv.activemq.topo.jmxutil.polling.JmxActiveMQUtil;
+import com.amlinv.activemq.topo.jmxutil.polling.JmxActiveMQUtil2;
 import com.amlinv.activemq.topo.registry.DestinationRegistry;
 import com.amlinv.activemq.topo.registry.model.DestinationState;
 import com.amlinv.jmxutil.connection.MBeanAccessConnection;
@@ -50,6 +50,7 @@ public class MBeanDestinationDiscovererTest {
     private MBeanAccessConnection mockAccessConnection;
     private DestinationState mockState1;
     private DestinationState mockState2;
+    private JmxActiveMQUtil2 mockJmxActiveMQUtil;
     private Logger mockLogger;
 
     private ObjectName searchDestinationPattern;
@@ -66,9 +67,10 @@ public class MBeanDestinationDiscovererTest {
         this.mockAccessConnection = Mockito.mock(MBeanAccessConnection.class);
         this.mockState1 = Mockito.mock(DestinationState.class);
         this.mockState2 = Mockito.mock(DestinationState.class);
+        this.mockJmxActiveMQUtil = Mockito.mock(JmxActiveMQUtil2.class);
         this.mockLogger = Mockito.mock(Logger.class);
 
-        this.searchDestinationPattern = JmxActiveMQUtil.getDestinationObjectName("*", "*", "x-dest-type-x");
+        this.searchDestinationPattern = new JmxActiveMQUtil2().getDestinationObjectName("*", "*", "x-dest-type-x");
 
         this.destObjectNameSet001 = new HashSet<>();
         this.destObjectNameSet001.add(new ObjectName("x-domain-x:destinationName=x-dest1-x"));

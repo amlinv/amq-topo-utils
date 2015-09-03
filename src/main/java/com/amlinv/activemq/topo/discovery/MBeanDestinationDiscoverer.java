@@ -17,7 +17,7 @@
 
 package com.amlinv.activemq.topo.discovery;
 
-import com.amlinv.activemq.topo.jmxutil.polling.JmxActiveMQUtil;
+import com.amlinv.activemq.topo.jmxutil.polling.JmxActiveMQUtil2;
 import com.amlinv.activemq.topo.registry.DestinationRegistry;
 import com.amlinv.activemq.topo.registry.model.DestinationState;
 import com.amlinv.jmxutil.connection.MBeanAccessConnection;
@@ -46,6 +46,7 @@ public class MBeanDestinationDiscoverer {
 
     private DestinationRegistry registry;
     private MBeanAccessConnectionFactory mBeanAccessConnectionFactory;
+    private JmxActiveMQUtil2 jmxActiveMQUtil = new JmxActiveMQUtil2();
 
     /**
      * Type of destination to discover, and which are maintained in the given registry.
@@ -90,6 +91,14 @@ public class MBeanDestinationDiscoverer {
         this.mBeanAccessConnectionFactory = mBeanAccessConnectionFactory;
     }
 
+    public JmxActiveMQUtil2 getJmxActiveMQUtil() {
+        return jmxActiveMQUtil;
+    }
+
+    public void setJmxActiveMQUtil(JmxActiveMQUtil2 jmxActiveMQUtil) {
+        this.jmxActiveMQUtil = jmxActiveMQUtil;
+    }
+
     public Logger getLog() {
         return log;
     }
@@ -115,7 +124,7 @@ public class MBeanDestinationDiscoverer {
 
         try {
             ObjectName destinationPattern =
-                    JmxActiveMQUtil.getDestinationObjectName(this.brokerName, "*", this.destinationType);
+                    this.jmxActiveMQUtil.getDestinationObjectName(this.brokerName, "*", this.destinationType);
 
             Set<ObjectName> found = connection.queryNames(destinationPattern, null);
 
@@ -123,7 +132,7 @@ public class MBeanDestinationDiscoverer {
             // Iterate over the mbean names matching the pattern, extract the destination name, and process.
             //
             for ( ObjectName oneDestOName : found ) {
-                String destName = JmxActiveMQUtil.extractDestinationName(oneDestOName);
+                String destName = this.jmxActiveMQUtil.extractDestinationName(oneDestOName);
 
                 this.onFoundDestination(destName);
                 remainingQueues.remove(destName);

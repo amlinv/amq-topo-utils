@@ -21,7 +21,6 @@ import com.amlinv.jmxutil.connection.MBeanAccessConnectionFactory;
 
 import javax.management.MalformedObjectNameException;
 import javax.management.ObjectName;
-import java.util.Set;
 
 /**
  * JMX ActiveMQ Utility.  Please use JmxActiveMQUtil2.  This class will be removed in a subsequent release.
