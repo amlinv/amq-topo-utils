@@ -25,7 +25,6 @@ import org.junit.Test;
 import org.mockito.Mockito;
 
 import javax.management.ObjectName;
-
 import java.util.Arrays;
 import java.util.HashSet;
 import java.util.Set;
@@ -35,9 +34,11 @@ import static org.junit.Assert.*;
 /**
  * Created by art on 8/30/15.
  */
-public class JmxActiveMQUtilTest {
+public class JmxActiveMQUtilTest2 {
 
     public static final String TEST_JMX_URL = "service:jmx:rmi:///jndi/rmi://localhost:1099/jmxrmi";
+
+    private JmxActiveMQUtil2 util;
 
     private MBeanAccessConnectionFactoryUtil origFactoryUtil;
 
@@ -47,6 +48,8 @@ public class JmxActiveMQUtilTest {
 
     @Before
     public void setupTest() throws Exception {
+        this.util = new JmxActiveMQUtil2();
+
         this.origFactoryUtil = JmxActiveMQUtil.getConnectionFactoryUtil();
 
         this.mockFactoryUtil = Mockito.mock(MBeanAccessConnectionFactoryUtil.class);
@@ -57,37 +60,36 @@ public class JmxActiveMQUtilTest {
                 .thenReturn(this.mockConnectionFactory);
         Mockito.when(this.mockConnectionFactory.createConnection()).thenReturn(this.mockConnection);
 
-        JmxActiveMQUtil.setConnectionFactoryUtil(this.mockFactoryUtil);
+        this.util.setConnectionFactoryUtil(this.mockFactoryUtil);
     }
 
     @After
     public void cleanupTest() throws Exception {
-        JmxActiveMQUtil.setConnectionFactoryUtil(origFactoryUtil);
     }
 
     @Test
     public void testFormatJmxUrl() throws Exception {
-        String result = JmxActiveMQUtil.formatJmxUrl("x-host-x", 11);
+        String result = this.util.formatJmxUrl("x-host-x", 11);
 
         assertEquals("service:jmx:rmi:///jndi/rmi://x-host-x:11/jmxrmi", result);
     }
 
     @Test
     public void testGetLocationConnectionFactoryService() throws Exception {
-        MBeanAccessConnectionFactory result = JmxActiveMQUtil.getLocationConnectionFactory(TEST_JMX_URL);
+        MBeanAccessConnectionFactory result = this.util.getLocationConnectionFactory(TEST_JMX_URL);
 
         assertSame(this.mockConnectionFactory, result);
     }
 
     @Test
     public void testQueryBrokerNames() throws Exception {
-        Mockito.when(this.mockConnection.queryNames(new ObjectName(JmxActiveMQUtil2.AMQ_BROKER_QUERY), null))
+        Mockito.when(this.mockConnection.queryNames(new ObjectName(this.util.AMQ_BROKER_QUERY), null))
                 .thenReturn(new HashSet<>(Arrays.asList(
-                        new ObjectName("x-domain-x:" + JmxActiveMQUtil2.AMQ_BROKER_NAME_KEY + "=broker1"),
-                        new ObjectName("x-domain-x:" + JmxActiveMQUtil2.AMQ_BROKER_NAME_KEY + "=broker2")
+                        new ObjectName("x-domain-x:" + this.util.AMQ_BROKER_NAME_KEY + "=broker1"),
+                        new ObjectName("x-domain-x:" + this.util.AMQ_BROKER_NAME_KEY + "=broker2")
                 )));
 
-        String[] names = JmxActiveMQUtil.queryBrokerNames(TEST_JMX_URL);
+        String[] names = this.util.queryBrokerNames(TEST_JMX_URL);
         Set<String> nameSet = new HashSet<>(Arrays.asList(names));
 
         assertEquals(2, nameSet.size());
@@ -103,11 +105,11 @@ public class JmxActiveMQUtilTest {
 
         Mockito.when(this.mockConnection.queryNames(new ObjectName(pattern), null))
                 .thenReturn(new HashSet<>(Arrays.asList(
-                        new ObjectName("x-domain-x:" + JmxActiveMQUtil2.AMQ_QUEUE_NAME_KEY + "=queue1"),
-                        new ObjectName("x-domain-x:" + JmxActiveMQUtil2.AMQ_QUEUE_NAME_KEY + "=queue2")
+                        new ObjectName("x-domain-x:" + this.util.AMQ_QUEUE_NAME_KEY + "=queue1"),
+                        new ObjectName("x-domain-x:" + this.util.AMQ_QUEUE_NAME_KEY + "=queue2")
                 )));
 
-        String[] names = JmxActiveMQUtil.queryQueueNames(TEST_JMX_URL, "x-broker-x", "x-queue-pattern-x");
+        String[] names = this.util.queryQueueNames(TEST_JMX_URL, "x-broker-x", "x-queue-pattern-x");
         Set<String> nameSet = new HashSet<>(Arrays.asList(names));
 
         assertEquals(2, nameSet.size());
@@ -117,7 +119,7 @@ public class JmxActiveMQUtilTest {
 
     @Test
     public void testGetDestinationObjectName() throws Exception {
-        ObjectName result = JmxActiveMQUtil.getDestinationObjectName("x-broker-x", "x-dest-name-x", "x-dest-type-x");
+        ObjectName result = this.util.getDestinationObjectName("x-broker-x", "x-dest-name-x", "x-dest-type-x");
 
         assertEquals(
                 new ObjectName("org.apache.activemq:type=Broker,brokerName=x-broker-x," +
@@ -129,16 +131,6 @@ public class JmxActiveMQUtilTest {
         ObjectName destObjectName = new ObjectName("org.apache.activemq:type=Broker,brokerName=x-broker-name-x," +
                 "destinationType=Queue,destinationName=x-dest-name-x");
 
-        assertEquals("x-dest-name-x", JmxActiveMQUtil.extractDestinationName(destObjectName));
-    }
-
-    /**
-     * Verify the constructor.  This is only for coverage purposes; the constructor should never be used in practice.
-     *
-     * @throws Exception
-     */
-    @Test
-    public void testConstructor() throws Exception {
-        new JmxActiveMQUtil();
+        assertEquals("x-dest-name-x", this.util.extractDestinationName(destObjectName));
     }
 }
